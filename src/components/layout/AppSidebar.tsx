@@ -22,6 +22,7 @@ const donorNav: NavItem[] = [
   { title: 'Servicio Social', url: '/servicio-social', icon: GraduationCap },
   { title: 'La Tesorería', url: '/tesoreria', icon: Gift },
   { title: 'Libro Blanco', url: '/libro-blanco', icon: BookOpen },
+  { title: 'Marco Legal', url: '/legal', icon: FileText },
 ];
 
 const receptorNav: NavItem[] = [
@@ -33,6 +34,7 @@ const receptorNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+  { title: 'Cumplimiento', url: '/compliance', icon: Shield },
   { title: 'Revisión', url: '/review', icon: Shield },
   { title: 'Financiero', url: '/finance', icon: TrendingUp },
   { title: 'PLD', url: '/pld', icon: AlertTriangle },

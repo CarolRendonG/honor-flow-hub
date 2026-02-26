@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import { mockProjects } from '@/data/mockData';
-import { BadgeCheck, MapPin, Users, ArrowLeft, Heart, RefreshCw, ChevronRight } from 'lucide-react';
+import { BadgeCheck, MapPin, Users, ArrowLeft, Heart, RefreshCw, ChevronRight, CreditCard, Building2, Banknote, AlertTriangle, Shield } from 'lucide-react';
 import { useState } from 'react';
+import { UMA_VALUE_MXN, convertToUMA, classifyDonor, getTierLabel, type PaymentMethod } from '@/data/complianceData';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -11,6 +12,12 @@ export default function ProjectDetail() {
   const [donated, setDonated] = useState(false);
   const [amount, setAmount] = useState(1000);
   const [recurring, setRecurring] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
+  const [showKycForm, setShowKycForm] = useState(false);
+
+  const amountUMA = convertToUMA(amount);
+  const tier = classifyDonor(amountUMA);
+  const needsKyc = tier !== 'basic';
 
   if (!project) return <div className="text-center py-20 text-muted-foreground">Proyecto no encontrado</div>;
 
@@ -18,8 +25,13 @@ export default function ProjectDetail() {
   const daysToGoal = Math.ceil(((project.goal - project.raised) / (project.raised / 180)));
 
   const handleDonate = () => {
+    if (needsKyc && !showKycForm) {
+      setShowKycForm(true);
+      return;
+    }
     setDonated(true);
-    setTimeout(() => setDonated(false), 3000);
+    setShowKycForm(false);
+    setTimeout(() => setDonated(false), 4000);
   };
 
   return (
@@ -85,30 +97,89 @@ export default function ProjectDetail() {
           </motion.div>
         ) : (
           <div className="space-y-4">
+            {/* Amount */}
             <div className="grid grid-cols-4 gap-2">
               {[500, 1000, 5000, 10000].map(a => (
-                <button key={a} onClick={() => setAmount(a)} className={`py-2 rounded-lg text-sm font-medium transition-all ${amount === a ? 'bg-primary text-primary-foreground glow-green-sm' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                <button key={a} onClick={() => { setAmount(a); setShowKycForm(false); }} className={`py-2 rounded-lg text-sm font-medium transition-all ${amount === a ? 'bg-primary text-primary-foreground glow-green-sm' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
                   ${a.toLocaleString()}
                 </button>
               ))}
             </div>
+
+            {/* Custom amount */}
+            <input type="number" value={amount} onChange={e => { setAmount(Number(e.target.value)); setShowKycForm(false); }} min={1}
+              className="w-full px-3 py-2 rounded-lg bg-secondary border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              placeholder="Monto personalizado" />
+
+            {/* UMA conversion */}
+            <div className="flex items-center justify-between text-xs text-muted-foreground p-2 rounded bg-secondary/50">
+              <span>Equivalente: <strong className="text-foreground">{amountUMA.toFixed(2)} UMAs</strong></span>
+              <span>UMA = ${UMA_VALUE_MXN}</span>
+            </div>
+
+            {/* Payment method */}
+            <div>
+              <label className="text-xs text-muted-foreground mb-2 block">Método de pago</label>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { id: 'card' as const, label: 'Tarjeta', icon: CreditCard },
+                  { id: 'transfer' as const, label: 'Transferencia', icon: Building2 },
+                  { id: 'cash' as const, label: 'Efectivo', icon: Banknote },
+                ]).map(m => (
+                  <button key={m.id} onClick={() => setPaymentMethod(m.id)}
+                    className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${paymentMethod === m.id ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-secondary text-muted-foreground hover:text-foreground border border-transparent'}`}>
+                    <m.icon className="w-3.5 h-3.5" /> {m.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input type="checkbox" checked={recurring} onChange={e => setRecurring(e.target.checked)} className="rounded border-border" />
               <RefreshCw className="w-3 h-3 text-muted-foreground" />
               Donación recurrente mensual
             </label>
-            {amount >= 160500 && (
-              <div className="p-3 rounded-lg bg-warning/10 border border-warning/30 text-sm text-warning">
-                ⚠️ Donación ≥ 1,605 UMA: Se requiere verificación KYC antes de confirmar.
+
+            {/* Compliance warnings */}
+            {needsKyc && (
+              <div className={`p-3 rounded-lg text-sm flex items-start gap-2 ${tier === 'sat_notice' ? 'bg-destructive/10 border border-destructive/30 text-destructive' : 'bg-warning/10 border border-warning/30 text-warning'}`}>
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                <div>
+                  <div className="font-medium">{getTierLabel(tier)}</div>
+                  <div className="text-xs mt-0.5 opacity-80">
+                    {tier === 'sat_notice'
+                      ? 'Donación ≥ 3,210 UMA: Se requiere KYC completo y reporte al SAT.'
+                      : 'Donación ≥ 1,605 UMA: Se requiere verificación de identidad (KYC).'}
+                  </div>
+                </div>
               </div>
             )}
+
+            {/* KYC Form */}
+            {showKycForm && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-3 p-4 rounded-lg bg-secondary/50 border border-border">
+                <div className="flex items-center gap-2 text-sm font-medium"><Shield className="w-4 h-4 text-primary" /> Verificación de Identidad</div>
+                <input placeholder="Nombre completo" className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <input placeholder="CURP o RFC" className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <div className="grid grid-cols-2 gap-2">
+                  <button className="py-2 rounded-lg bg-secondary text-sm text-muted-foreground hover:text-foreground transition-all border border-dashed border-border">📄 Subir INE/Pasaporte</button>
+                  <button className="py-2 rounded-lg bg-secondary text-sm text-muted-foreground hover:text-foreground transition-all border border-dashed border-border">📄 Comprobante domicilio</button>
+                </div>
+                {tier === 'sat_notice' && (
+                  <div className="p-2 rounded bg-destructive/10 text-xs text-destructive flex items-center gap-1.5">
+                    <AlertTriangle className="w-3 h-3" /> Esta operación será reportada al SAT conforme a LFPIORPI.
+                  </div>
+                )}
+              </motion.div>
+            )}
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleDonate}
               className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold glow-green hover:opacity-90 transition-all"
             >
-              Donar ${amount.toLocaleString()} MXN
+              {needsKyc && !showKycForm ? 'Continuar con Verificación' : `Donar $${amount.toLocaleString()} MXN`}
             </motion.button>
           </div>
         )}
