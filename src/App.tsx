@@ -16,6 +16,8 @@ import Tesoreria from "./pages/donor/Tesoreria";
 import LibroBlanco from "./pages/donor/LibroBlanco";
 import ReceptorDashboard from "./pages/receptor/ReceptorDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ComplianceDashboard from "./pages/admin/ComplianceDashboard";
+import LegalCompliance from "./pages/LegalCompliance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,9 +51,11 @@ const App = () => (
             <Route path="/updates" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
             <Route path="/dispersions" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
             <Route path="/review" element={<AppLayout><AdminDashboard /></AppLayout>} />
+            <Route path="/compliance" element={<AppLayout><ComplianceDashboard /></AppLayout>} />
             <Route path="/finance" element={<AppLayout><AdminDashboard /></AppLayout>} />
             <Route path="/pld" element={<AppLayout><AdminDashboard /></AppLayout>} />
             <Route path="/receipts" element={<AppLayout><AdminDashboard /></AppLayout>} />
+            <Route path="/legal" element={<AppLayout><LegalCompliance /></AppLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
