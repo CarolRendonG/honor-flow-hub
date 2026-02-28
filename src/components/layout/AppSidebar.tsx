@@ -35,6 +35,7 @@ const receptorNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+  { title: 'Usuarios', url: '/users', icon: Shield },
   { title: 'Cumplimiento', url: '/compliance', icon: Shield },
   { title: 'Revisión', url: '/review', icon: Shield },
   { title: 'Financiero', url: '/finance', icon: TrendingUp },
@@ -81,7 +82,7 @@ export function AppSidebar() {
       {!collapsed && (
         <div className="px-4 py-3">
           <div className="text-xs text-muted-foreground uppercase tracking-wider">{roleLabel}</div>
-          <div className="text-sm font-medium truncate">{user.name}</div>
+          <div className="text-sm font-medium truncate">{user.fullName || user.email}</div>
         </div>
       )}
 
@@ -112,7 +113,7 @@ export function AppSidebar() {
       {user.role === 'donor' && !collapsed && (
         <div className="p-4 mx-3 mb-2 rounded-lg bg-primary/10 border border-primary/20">
           <div className="text-xs text-muted-foreground">Honor Points</div>
-          <div className="text-xl font-bold text-primary">{user.honorPoints.toLocaleString()}</div>
+          <div className="text-xl font-bold text-primary">0</div>
         </div>
       )}
 
