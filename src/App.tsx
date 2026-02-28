@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
-import Login from "./pages/Login";
+import Auth from "./pages/Auth";
 import DonorDashboard from "./pages/donor/DonorDashboard";
 import ExploreProjects from "./pages/donor/ExploreProjects";
 import ProjectDetail from "./pages/donor/ProjectDetail";
@@ -18,17 +18,41 @@ import ReceptorDashboard from "./pages/receptor/ReceptorDashboard";
 import ReceptorPldAlerts from "./pages/receptor/ReceptorPldAlerts";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ComplianceDashboard from "./pages/admin/ComplianceDashboard";
+import UserManagement from "./pages/admin/UserManagement";
 import LegalCompliance from "./pages/LegalCompliance";
 import NotFound from "./pages/NotFound";
+import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 function DashboardRouter() {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/auth" replace />;
   if (user.role === 'donor') return <DonorDashboard />;
   if (user.role === 'receptor') return <ReceptorDashboard />;
   return <AdminDashboard />;
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+  if (!isAuthenticated) return <Navigate to="/auth" replace />;
+  return <AppLayout>{children}</AppLayout>;
+}
+
+function AuthGuard() {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  return <Auth />;
 }
 
 const App = () => (
@@ -39,25 +63,27 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LoginGuard />} />
-            <Route path="/dashboard" element={<AppLayout><DashboardRouter /></AppLayout>} />
-            <Route path="/explore" element={<AppLayout><ExploreProjects /></AppLayout>} />
-            <Route path="/project/:id" element={<AppLayout><ProjectDetail /></AppLayout>} />
-            <Route path="/expedientes" element={<AppLayout><Expedientes /></AppLayout>} />
-            <Route path="/events" element={<AppLayout><Events /></AppLayout>} />
-            <Route path="/servicio-social" element={<AppLayout><ServicioSocial /></AppLayout>} />
-            <Route path="/tesoreria" element={<AppLayout><Tesoreria /></AppLayout>} />
-            <Route path="/libro-blanco" element={<AppLayout><LibroBlanco /></AppLayout>} />
-            <Route path="/my-projects" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
-            <Route path="/receptor-pld" element={<AppLayout><ReceptorPldAlerts /></AppLayout>} />
-            <Route path="/updates" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
-            <Route path="/dispersions" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
-            <Route path="/review" element={<AppLayout><AdminDashboard /></AppLayout>} />
-            <Route path="/compliance" element={<AppLayout><ComplianceDashboard /></AppLayout>} />
-            <Route path="/finance" element={<AppLayout><AdminDashboard /></AppLayout>} />
-            <Route path="/pld" element={<AppLayout><AdminDashboard /></AppLayout>} />
-            <Route path="/receipts" element={<AppLayout><AdminDashboard /></AppLayout>} />
-            <Route path="/legal" element={<AppLayout><LegalCompliance /></AppLayout>} />
+            <Route path="/" element={<AuthGuard />} />
+            <Route path="/auth" element={<AuthGuard />} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
+            <Route path="/explore" element={<ProtectedRoute><ExploreProjects /></ProtectedRoute>} />
+            <Route path="/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+            <Route path="/expedientes" element={<ProtectedRoute><Expedientes /></ProtectedRoute>} />
+            <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+            <Route path="/servicio-social" element={<ProtectedRoute><ServicioSocial /></ProtectedRoute>} />
+            <Route path="/tesoreria" element={<ProtectedRoute><Tesoreria /></ProtectedRoute>} />
+            <Route path="/libro-blanco" element={<ProtectedRoute><LibroBlanco /></ProtectedRoute>} />
+            <Route path="/my-projects" element={<ProtectedRoute><ReceptorDashboard /></ProtectedRoute>} />
+            <Route path="/receptor-pld" element={<ProtectedRoute><ReceptorPldAlerts /></ProtectedRoute>} />
+            <Route path="/updates" element={<ProtectedRoute><ReceptorDashboard /></ProtectedRoute>} />
+            <Route path="/dispersions" element={<ProtectedRoute><ReceptorDashboard /></ProtectedRoute>} />
+            <Route path="/review" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/compliance" element={<ProtectedRoute><ComplianceDashboard /></ProtectedRoute>} />
+            <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+            <Route path="/finance" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/pld" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/receipts" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/legal" element={<ProtectedRoute><LegalCompliance /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
@@ -65,11 +91,5 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
-function LoginGuard() {
-  const { isAuthenticated } = useAuth();
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
-  return <Login />;
-}
 
 export default App;

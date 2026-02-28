@@ -35,7 +35,7 @@ export default function DonorDashboard() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold">Bienvenido, {user?.name?.split(' ')[0]} 👋</h1>
+        <h1 className="text-2xl font-bold">Bienvenido, {user?.fullName?.split(' ')[0] || 'Donante'} 👋</h1>
         <p className="text-muted-foreground">Tu impacto social en tiempo real</p>
       </motion.div>
 
