@@ -28,6 +28,7 @@ const donorNav: NavItem[] = [
 const receptorNav: NavItem[] = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Mis Proyectos', url: '/my-projects', icon: FolderOpen },
+  { title: 'Alertas PLD', url: '/receptor-pld', icon: AlertTriangle },
   { title: 'Subir Updates', url: '/updates', icon: Upload },
   { title: 'Dispersiones', url: '/dispersions', icon: Banknote },
 ];

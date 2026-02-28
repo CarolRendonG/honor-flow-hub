@@ -15,6 +15,7 @@ import ServicioSocial from "./pages/donor/ServicioSocial";
 import Tesoreria from "./pages/donor/Tesoreria";
 import LibroBlanco from "./pages/donor/LibroBlanco";
 import ReceptorDashboard from "./pages/receptor/ReceptorDashboard";
+import ReceptorPldAlerts from "./pages/receptor/ReceptorPldAlerts";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ComplianceDashboard from "./pages/admin/ComplianceDashboard";
 import LegalCompliance from "./pages/LegalCompliance";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/tesoreria" element={<AppLayout><Tesoreria /></AppLayout>} />
             <Route path="/libro-blanco" element={<AppLayout><LibroBlanco /></AppLayout>} />
             <Route path="/my-projects" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
+            <Route path="/receptor-pld" element={<AppLayout><ReceptorPldAlerts /></AppLayout>} />
             <Route path="/updates" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
             <Route path="/dispersions" element={<AppLayout><ReceptorDashboard /></AppLayout>} />
             <Route path="/review" element={<AppLayout><AdminDashboard /></AppLayout>} />
