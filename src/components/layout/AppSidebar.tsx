@@ -3,10 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Search, Heart, Calendar, BookOpen, GraduationCap,
   Gift, Shield, FileText, TrendingUp, AlertTriangle, Receipt,
-  FolderOpen, Upload, Banknote, LogOut, ChevronLeft
+  LogOut, ChevronLeft, Sun, Moon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logoImg from '@/assets/logo-cashedhub.png';
 
 interface NavItem {
@@ -28,11 +28,8 @@ const donorNav: NavItem[] = [
 
 const receptorNav: NavItem[] = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Mis Proyectos', url: '/my-projects', icon: FolderOpen },
   { title: 'SAT', url: '/sat-reporting', icon: Receipt },
   { title: 'Alertas PLD', url: '/receptor-pld', icon: AlertTriangle },
-  { title: 'Subir Updates', url: '/updates', icon: Upload },
-  { title: 'Dispersiones', url: '/dispersions', icon: Banknote },
 ];
 
 const adminNav: NavItem[] = [
@@ -49,6 +46,13 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains('light'));
+
+  const toggleTheme = () => {
+    const next = !isLight;
+    setIsLight(next);
+    document.documentElement.classList.toggle('light', next);
+  };
 
   if (!user) return null;
 
@@ -115,8 +119,15 @@ export function AppSidebar() {
         </div>
       )}
 
-      {/* Logout */}
-      <div className="p-3 border-t border-border/50">
+      {/* Theme toggle + Logout */}
+      <div className="p-3 border-t border-border/50 space-y-1">
+        <button onClick={toggleTheme} className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all w-full",
+          collapsed && "justify-center px-0"
+        )}>
+          {isLight ? <Moon className="w-4 h-4 shrink-0" /> : <Sun className="w-4 h-4 shrink-0" />}
+          {!collapsed && <span>{isLight ? 'Modo Oscuro' : 'Modo Claro'}</span>}
+        </button>
         <button onClick={logout} className={cn(
           "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all w-full",
           collapsed && "justify-center px-0"
