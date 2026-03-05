@@ -1,13 +1,20 @@
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import { mockProjects } from '@/data/mockData';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Heart, X, Zap, MapPin, BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDonations } from '@/contexts/DonationContext';
 
 export default function Expedientes() {
-  const [cards, setCards] = useState([...mockProjects].reverse());
+  const { donatedProjectIds } = useDonations();
+  const [cards, setCards] = useState(() => [...mockProjects].filter(p => !donatedProjectIds.has(p.id)).reverse());
   const [lastAction, setLastAction] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Filter out newly donated projects when returning to this page
+  useEffect(() => {
+    setCards(prev => prev.filter(p => !donatedProjectIds.has(p.id)));
+  }, [donatedProjectIds]);
 
   const removeTop = useCallback((action: 'match' | 'skip' | 'super') => {
     if (action === 'super') {

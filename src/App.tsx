@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { DonationProvider } from "./contexts/DonationContext";
 import { AppLayout } from "./components/layout/AppLayout";
 import Auth from "./pages/Auth";
 import DonorDashboard from "./pages/donor/DonorDashboard";
@@ -29,7 +30,7 @@ const queryClient = new QueryClient();
 function DashboardRouter() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/auth" replace />;
-  if (user.role === 'donor') return <DonorDashboard />;
+  if (user.role === 'donor') return <Navigate to="/expedientes" replace />;
   if (user.role === 'receptor') return <ReceptorDashboard />;
   return <AdminDashboard />;
 }
@@ -62,6 +63,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
+        <DonationProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<AuthGuard />} />
@@ -82,6 +84,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </DonationProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

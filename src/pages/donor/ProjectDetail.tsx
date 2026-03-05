@@ -4,10 +4,12 @@ import { mockProjects } from '@/data/mockData';
 import { BadgeCheck, MapPin, Users, ArrowLeft, Heart, RefreshCw, ChevronRight, CreditCard, Building2, Banknote, AlertTriangle, Shield } from 'lucide-react';
 import { useState } from 'react';
 import { UMA_VALUE_MXN, convertToUMA, classifyDonor, getTierLabel, type PaymentMethod } from '@/data/complianceData';
+import { useDonations } from '@/contexts/DonationContext';
 
 export default function ProjectDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { recordDonation } = useDonations();
   const project = mockProjects.find(p => p.id === id);
   const [showVerified, setShowVerified] = useState(false);
   const [donated, setDonated] = useState(false);
@@ -32,6 +34,7 @@ export default function ProjectDetail() {
     }
     setDonated(true);
     setShowKycForm(false);
+    if (id) recordDonation(id, amount);
   };
 
   return (

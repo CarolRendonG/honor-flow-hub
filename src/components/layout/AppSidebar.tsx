@@ -8,6 +8,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import logoImg from '@/assets/logo-cashedhub.png';
+import { useDonations } from '@/contexts/DonationContext';
 
 interface NavItem {
   title: string;
@@ -40,6 +41,7 @@ const adminNav: NavItem[] = [
 
 export function AppSidebar() {
   const { user, logout } = useAuth();
+  const { honorPoints } = useDonations();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains('light'));
@@ -111,7 +113,7 @@ export function AppSidebar() {
       {user.role === 'donor' && !collapsed && (
         <div className="p-4 mx-3 mb-2 rounded-lg bg-primary/10 border border-primary/20">
           <div className="text-xs text-muted-foreground">Honor Points</div>
-          <div className="text-xl font-bold text-primary">0</div>
+          <div className="text-xl font-bold text-primary">{honorPoints.toLocaleString()}</div>
         </div>
       )}
 
