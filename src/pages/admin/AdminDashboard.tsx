@@ -1,7 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { adminStats, mockProjects } from '@/data/mockData';
-import { Shield, DollarSign, AlertTriangle, FileText, TrendingUp, Users, CheckCircle2, Clock, XCircle, Eye } from 'lucide-react';
+import { Shield, DollarSign, AlertTriangle, FileText, TrendingUp, Users, CheckCircle2, Clock, XCircle, Eye, Bell } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useState } from 'react';
 
 const pieData = [
   { name: 'Educación', value: 35, color: 'hsl(82, 100%, 36%)' },
@@ -17,25 +18,79 @@ const pendingReview = [
   { id: 'r3', project: 'Donación anónima $180,000', status: 'alert', docs: 2, totalDocs: 6, risk: 'red' as const },
 ];
 
+const pldNotifications = [
+  { id: 'n1', title: 'Donación anónima $180,000 sin KYC', detail: 'Acumulado 6 meses: $520,000 · Requiere verificación', level: 'urgent' as const },
+  { id: 'n2', title: 'Donante frecuente cerca de umbral UMA', detail: 'Acumulado: $148,000 / $160,500 (92%)', level: 'warning' as const },
+];
+
 const riskColors = { green: 'text-success', yellow: 'text-warning', red: 'text-destructive' };
 const riskLabels = { green: 'Completo', yellow: 'Pendiente', red: 'Alerta PLD' };
 const riskIcons = { green: CheckCircle2, yellow: Clock, red: AlertTriangle };
 
 export default function AdminDashboard() {
+  const [showNotifs, setShowNotifs] = useState(false);
+
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Shield className="w-6 h-6 text-primary" /> Panel Admin</h1>
-        <p className="text-muted-foreground">Centro de control Cashed</p>
+      {/* Header with PLD notifications bell */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><Shield className="w-6 h-6 text-primary" /> Panel Admin</h1>
+          <p className="text-muted-foreground">Centro de control Cashed</p>
+        </div>
+        {/* PLD Notification Bell */}
+        <div className="relative">
+          <button
+            onClick={() => setShowNotifs(!showNotifs)}
+            className="relative p-2.5 rounded-xl glass hover:bg-destructive/10 transition-all"
+          >
+            <Bell className="w-5 h-5 text-destructive" />
+            {adminStats.pldAlerts > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">
+                {adminStats.pldAlerts}
+              </span>
+            )}
+          </button>
+          <AnimatePresence>
+            {showNotifs && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                className="absolute right-0 top-12 w-80 glass-strong rounded-xl border border-border/50 shadow-2xl z-50 overflow-hidden"
+              >
+                <div className="p-3 border-b border-border/50 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-destructive" />
+                  <span className="text-sm font-semibold">Alertas PLD / Anti-Lavado</span>
+                </div>
+                <div className="p-2 space-y-1 max-h-64 overflow-y-auto">
+                  {pldNotifications.map(n => (
+                    <div
+                      key={n.id}
+                      className={`p-3 rounded-lg ${n.level === 'urgent' ? 'bg-destructive/10 border border-destructive/20' : 'bg-warning/10 border border-warning/20'}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${n.level === 'urgent' ? 'bg-destructive/20 text-destructive' : 'bg-warning/20 text-warning'}`}>
+                          {n.level === 'urgent' ? 'Urgente' : 'Monitoreo'}
+                        </span>
+                      </div>
+                      <div className="text-sm font-medium">{n.title}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{n.detail}</div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Stats - 3 cards */}
+      <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Total Movido', value: `$${(adminStats.totalMoved / 1e6).toFixed(1)}M`, icon: DollarSign, color: 'text-primary' },
           { label: 'Hoy', value: `$${(adminStats.todayMoved / 1e3).toFixed(0)}K`, icon: TrendingUp, color: 'text-accent' },
           { label: 'Donantes Totales', value: adminStats.totalDonors.toLocaleString(), icon: Users, color: 'text-info' },
-          { label: 'Alertas PLD', value: adminStats.pldAlerts.toString(), icon: AlertTriangle, color: 'text-destructive' },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass rounded-xl p-4">
             <div className="flex items-center justify-between mb-1">
@@ -97,29 +152,8 @@ export default function AdminDashboard() {
         </motion.div>
       </div>
 
-      {/* PLD Module */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass rounded-xl p-6 border-destructive/20">
-        <h3 className="font-semibold mb-4 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-destructive" /> Módulo PLD / Anti-Lavado</h3>
-        <div className="space-y-2">
-          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center justify-between">
-            <div>
-              <div className="text-sm font-medium">Donación anónima $180,000 sin KYC</div>
-              <div className="text-xs text-muted-foreground">Acumulado 6 meses: $520,000 · Requiere verificación</div>
-            </div>
-            <span className="px-2 py-1 rounded-full text-xs bg-destructive/20 text-destructive font-medium">Urgente</span>
-          </div>
-          <div className="p-3 rounded-lg bg-warning/10 border border-warning/20 flex items-center justify-between">
-            <div>
-              <div className="text-sm font-medium">Donante frecuente cerca de umbral UMA</div>
-              <div className="text-xs text-muted-foreground">Acumulado: $148,000 / $160,500 (92%)</div>
-            </div>
-            <span className="px-2 py-1 rounded-full text-xs bg-warning/20 text-warning font-medium">Monitoreo</span>
-          </div>
-        </div>
-      </motion.div>
-
       {/* CFDI */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass rounded-xl p-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass rounded-xl p-6">
         <h3 className="font-semibold mb-3 flex items-center gap-2"><FileText className="w-4 h-4 text-primary" /> Recibos CFDI</h3>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">{adminStats.receiptsGenerated} recibos generados</span>
