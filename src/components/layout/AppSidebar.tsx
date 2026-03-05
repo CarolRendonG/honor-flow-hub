@@ -2,7 +2,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Search, Heart, Calendar, BookOpen, GraduationCap,
-  Gift, Shield, FileText, TrendingUp, AlertTriangle, Receipt,
+  Gift, Shield, FileText, TrendingUp, AlertTriangle, Receipt, Users,
   LogOut, ChevronLeft, Sun, Moon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,12 +34,8 @@ const receptorNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Usuarios', url: '/users', icon: Shield },
+  { title: 'Usuarios', url: '/users', icon: Users },
   { title: 'Cumplimiento', url: '/compliance', icon: Shield },
-  { title: 'Revisión', url: '/review', icon: Shield },
-  { title: 'Financiero', url: '/finance', icon: TrendingUp },
-  { title: 'PLD', url: '/pld', icon: AlertTriangle },
-  { title: 'Recibos', url: '/receipts', icon: Receipt },
 ];
 
 export function AppSidebar() {

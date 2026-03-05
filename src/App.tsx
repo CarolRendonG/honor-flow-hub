@@ -76,12 +76,8 @@ const App = () => (
             <Route path="/libro-blanco" element={<ProtectedRoute><LibroBlanco /></ProtectedRoute>} />
             <Route path="/sat-reporting" element={<ProtectedRoute><SatReporting /></ProtectedRoute>} />
             <Route path="/receptor-pld" element={<ProtectedRoute><ReceptorPldAlerts /></ProtectedRoute>} />
-            <Route path="/review" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/compliance" element={<ProtectedRoute><ComplianceDashboard /></ProtectedRoute>} />
             <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-            <Route path="/finance" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/pld" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/receipts" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/legal" element={<ProtectedRoute><LegalCompliance /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
