@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockProjects } from '@/data/mockData';
 import { BadgeCheck, MapPin, Users, ArrowLeft, Heart, RefreshCw, ChevronRight, CreditCard, Building2, Banknote, AlertTriangle, Shield } from 'lucide-react';
 import { useState } from 'react';
 import { UMA_VALUE_MXN, convertToUMA, classifyDonor, getTierLabel, type PaymentMethod } from '@/data/complianceData';
 
 export default function ProjectDetail() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const project = mockProjects.find(p => p.id === id);
   const [showVerified, setShowVerified] = useState(false);
@@ -31,7 +32,6 @@ export default function ProjectDetail() {
     }
     setDonated(true);
     setShowKycForm(false);
-    setTimeout(() => setDonated(false), 4000);
   };
 
   return (
@@ -94,6 +94,12 @@ export default function ProjectDetail() {
             <h3 className="text-xl font-bold text-primary">¡Gracias por tu donación!</h3>
             <p className="text-muted-foreground text-sm mt-2">Tu recibo CFDI ha sido generado</p>
             <div className="mt-3 text-sm text-gold">+{Math.round(amount / 10)} Honor Points ganados ⭐</div>
+            <button
+              onClick={() => navigate('/expedientes')}
+              className="mt-5 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-all"
+            >
+              Seguir viendo proyectos →
+            </button>
           </motion.div>
         ) : (
           <div className="space-y-4">
