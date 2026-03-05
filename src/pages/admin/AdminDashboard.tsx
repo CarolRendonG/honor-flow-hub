@@ -44,7 +44,7 @@ export default function AdminDashboard() {
             onClick={() => setShowNotifs(!showNotifs)}
             className="relative p-2.5 rounded-xl glass hover:bg-destructive/10 transition-all"
           >
-            <Bell className="w-5 h-5 text-destructive" />
+            <AlertTriangle className="w-5 h-5 text-destructive" />
             {adminStats.pldAlerts > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">
                 {adminStats.pldAlerts}
